@@ -24,7 +24,31 @@ Script Data End */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "QuestData.h"
+
+enum DirtStained
+{
+	ITEM_DIRT_STAINED_SCROLL		= 58898,
+	QUEST_HE_WHO_CONTROLS_ETTINS	= 26519,
+};
+
+class player_dirt_stained_scroll : public PlayerScript
+{
+public:
+	player_dirt_stained_scroll() : PlayerScript("player_dirt_stained_scroll") {}
+
+	void OnItemLoot(Player* player, Item* item, uint32 count)
+	{
+		if (player->GetQuestStatus(QUEST_HE_WHO_CONTROLS_ETTINS == QUEST_STATUS_REWARDED))
+			return;
+
+		if (player->GetQuestStatus(QUEST_HE_WHO_CONTROLS_ETTINS) == QUEST_STATUS_NONE || player->HasItemCount(ITEM_DIRT_STAINED_SCROLL, 1, false))
+			if (Quest const* quest = sQuestDataStore->GetQuestTemplate(QUEST_HE_WHO_CONTROLS_ETTINS))
+				player->AddQuest(quest, player);
+	}
+};
 
 void AddSC_redridge_mountains()
 {
+	new player_dirt_stained_scroll();
 }
